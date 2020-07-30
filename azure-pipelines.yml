@@ -10,8 +10,6 @@ pool:
   vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python37:
-      python.version: '3.7'
     Python38:
       python.version: '3.8'
 
@@ -29,6 +27,7 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
+    export ANSIBLE_LOG_PATH=/tmp/ansible.log
     fake-switches &
     cd brosim ; python brosim.py & cd ..
     ansible-playbook svc_host.yml
@@ -37,4 +36,5 @@ steps:
     ansible-playbook svc_host.yml --check
     ansible-playbook network_leaf.yml --check
     ansible-playbook brocade_zoning.yml --check
+    cat /tmp/playbook.debug /tmp/ansible.log
   displayName: 'test'

@@ -6,7 +6,7 @@ My ansible tester
 
 Test Ansible collections for
 - brocade fc switches
-- ibm svc switches
+- ibm svc
 - cisco switches
 
 (TODO: enclosures)

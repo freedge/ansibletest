@@ -9,7 +9,6 @@
 
   tasks:
   - import_tasks: tasks/brocade_zoning.yml
-    run_once: true
     delegate_to: localhost
     vars:
       hosts: "{{groups[inventory_hostname+\"_host\"]}}"

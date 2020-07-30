@@ -30,6 +30,10 @@ steps:
     export ANSIBLE_LOG_PATH=/tmp/ansible.log
     fake-switches &
     cd brosim ; python brosim.py & cd ..
+    sleep 1
+    mkdir ~/.ssh
+    ssh-keyscan -H 127.0.0.1 -p 2222 >> ~/.ssh/known_hosts
+    
     ansible-playbook svc_host.yml
     ansible-playbook network_leaf.yml
     ansible-playbook brocade_zoning.yml

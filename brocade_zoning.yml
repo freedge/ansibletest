@@ -1,0 +1,22 @@
+---
+- name: Define zoning on fc switch per blade
+  hosts: brocade
+  connection: local
+  gather_facts: no
+  any_errors_fatal: true
+  collections:
+    - brocade.fos
+
+  tasks:
+  - import_tasks: tasks/brocade_zoning.yml
+    run_once: true
+    delegate_to: localhost
+    vars:
+      hosts: "{{groups[inventory_hostname+\"_host\"]}}"
+      credential:
+        fos_ip_addr:   "{{ server_ip }}"
+        fos_user_name: "{{ lookup('env','BROCADE_USERNAME') }}"
+        fos_password:  "{{ lookup('env','BROCADE_PASSWORD') }}"
+        https: "self"
+    
+

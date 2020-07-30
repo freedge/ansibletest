@@ -1,0 +1,15 @@
+- name: check for interfaces on {{interconnect.switch}}
+  nxos_config:
+    match: "{{matchmode}}"    # Use this to actually compare the full "{{matchmode}}"
+    replace: "{{replacemode}}"  #
+    parents: interface FastEthernet{{ interconnect.oltp1.rport }}
+    running_config: "{{lookup('file', backup_path)}}"
+
+    lines:
+    - description {{ interconnect.oltp1.description }}
+    - switchport mode trunk
+    - switchport trunk native vlan 1000
+    - switchport trunk allowed vlan {{ vlan }}
+    - channel-group {{interconnect.oltp1.pc}} mode active
+    - no shutdown
+

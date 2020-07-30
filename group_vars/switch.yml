@@ -1,0 +1,12 @@
+ansible_connection: network_cli
+ansible_network_os: nxos
+ansible_user: root
+ansible_password: root
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_password: root
+ansible_port: 2222
+ansible_connect_timeout: 3
+ansible_command_timeout: 15
+# ansible_terminal_stdout_re: 
+# - pattern: ".*(switch|enable).*"

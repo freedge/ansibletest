@@ -1,0 +1,144 @@
+# First, we define a few objects to use to call the brocade API, that way we can send a bunch
+# of zones at once instead of multiplying calls to the API.
+- name: Prepare facts with all zones and config we need for that host
+  set_fact:
+    zoneliststr: >-
+      {% for inv_hostname in hosts -%}
+      {% set nodeportconfig = nodeportconfig[hostvars[inv_hostname].nodeportconfig] -%}
+      {% for item in nodeportconfig -%}
+      - z_h_{{inv_hostname}}_{{brocadeindex}}_{{item.nodename}}_{{item.zone_suffix}}
+
+      {% endfor -%}
+      {% endfor -%}
+    zonesstr: >-
+      {% for inv_hostname in hosts -%}
+      {% set nodeportconfig = nodeportconfig[hostvars[inv_hostname].nodeportconfig] -%}
+      {% for item in nodeportconfig -%}
+      - name: z_h_{{inv_hostname}}_{{brocadeindex}}_{{item.nodename}}_{{item.zone_suffix}}
+        members:
+        {% for port in item.ports -%}
+        - "{{item.nodename}}_{{port}}"
+
+        {% endfor -%}
+        - "{{inv_hostname}}_{{brocadeindex}}"
+      {% endfor -%}
+      {% endfor -%}
+    configstr: >-
+      - name: "{{configname}}"
+        members:
+          {% for inv_hostname in hosts -%}
+          {% set nodeportconfig = nodeportconfig[hostvars[inv_hostname].nodeportconfig] -%}
+          {% for item in nodeportconfig -%}
+          - z_h_{{inv_hostname}}_{{brocadeindex}}_{{ item.nodename }}_{{item.zone_suffix}}
+
+          {% endfor -%}
+          {% endfor -%}
+    aliasstr: >-
+      {% for inv_hostname in hosts -%}
+      - name: "{{inv_hostname}}_{{brocadeindex}}"
+        members:
+        - "{{hostvars[inv_hostname][wwpn]}}"
+      {% endfor -%}
+  delegate_to: localhost
+
+- name: Prepare facts with all zones and config we need for that host
+  set_fact:
+    zones: "{{ zonesstr | from_yaml }}"
+    cfgs: "{{ configstr | from_yaml }}"
+    aliases: "{{ aliasstr | from_yaml }}"
+    zonelist: "{{ zoneliststr | from_yaml }}"
+  delegate_to: localhost
+
+
+- name: Define aliases, wwpn are updated if changed
+  delegate_to: localhost
+  brocade_zoning_alias:
+    credential: "{{credential}}"
+    vfid: -1
+    aliases: "{{ aliases }}"
+
+- name: Define zones, zone are updated if changed
+  delegate_to: localhost
+  brocade_zoning_zone:
+    credential: "{{credential}}"
+    vfid: -1
+    zones: "{{zones}}"
+
+
+- name: Define config, ensure zone is part of the config
+  delegate_to: localhost
+  brocade_zoning_cfg:
+    credential: "{{credential}}"
+    vfid: -1
+    members_add_only: True # very important - this means we don't remove the rest of the zones
+    cfgs: "{{ cfgs }}"
+
+
+# Due to our naming convention for zone, if we change the zoning of a node, it will never actually change
+# an existing zone, but create a zone with a different name. Therefore we run the risk of having blades
+# zoned multiple times, by mistake.
+# To avoid this proble, we are checking the entire list of zones in the swith, find any that match
+# our selected blades, and remove any extra zone we could find.
+
+- name: Get the entire list of zones from the switch
+  delegate_to: localhost
+  check_mode: false
+  brocade_facts:
+    credential: "{{credential}}"
+    vfid: -1
+    gather_subset:
+    - brocade_zoning
+
+- name: Get an array of zones
+  set_fact:
+    existing_zones: "{{ansible_facts[\"brocade_zoning\"][\"defined-configuration\"].zone | map(attribute=\"zone-name\") | list }}"
+    existing_zones_for_blades: []
+- set_fact:
+    existing_zones_for_blades: "{{existing_zones_for_blades + (existing_zones | select('match', \"z_h_\" + item + \".*\") | list)}} "
+  loop: "{{ansible_play_hosts}}"
+- name: Compute list of extra zones to delete
+  set_fact: 
+    config_zones_to_remove: "{{existing_zones_for_blades | difference(zonelist) | list }}"
+- name: Generate plan to delete extra zones
+  set_fact:
+    zones_to_remove_str: >-
+      {% for config_zone in config_zones_to_remove -%}
+      - name: "{{config_zone}}"
+
+      {% endfor -%}
+  when: config_zones_to_remove | length > 0
+- set_fact:
+    zones_to_remove: "{{zones_to_remove_str | from_yaml }}"
+  when: config_zones_to_remove | length > 0
+  changed_when: true  # we just say it changed here because the brocade tasks do not necessarily report the change in check mode
+
+- debug:
+    msg: "These are the zones that should be destroyed on {{brocade.server_ip}}: {{config_zones_to_remove }}"
+  when: config_zones_to_remove | length > 0
+
+- name: Remove extra zone from config
+  delegate_to: localhost
+  tags:
+    - delete
+  brocade_zoning_cfg:
+    credential: "{{credential}}"
+    vfid: -1
+    members_remove_only: True # very important - this means we don't remove the rest of the zones
+    cfgs:
+    - name: "{{brocade.configname }}"
+      members: "{{config_zones_to_remove}}"
+  when: config_zones_to_remove | length > 0
+  changed_when: true
+
+
+- name: Remove extra zones
+  delegate_to: localhost
+  tags:
+    - delete
+  brocade_zoning_zone:
+    credential: "{{credential}}"
+    vfid: -1
+    zones_to_delete: "{{zones_to_remove}}"
+  when: config_zones_to_remove | length > 0
+  changed_when: true
+

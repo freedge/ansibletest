@@ -1,0 +1,33 @@
+# document config 
+
+- name: Check leaf configuration in dump
+  hosts: switch
+  serial: 1
+  gather_facts: false
+  collections:
+    - cisco.nxos
+  tasks:
+
+  - set_fact:
+      matchmode:   line
+      replacemode: line
+
+  - name: first backup the existing conf
+    check_mode: false
+    nxos_config:
+      backup: true
+    register: var
+    changed_when: False
+
+  - debug:
+      msg: "{{var.backup_path}}"
+
+  - include_tasks: tasks/network_leaf_test.yml
+    vars:
+      backup_path: "{{var.backup_path}}"
+      interconnect: "{{hostvars[item].interconnect}}"
+      vlan: "{{hostvars[item].vlan}}"
+    loop: "{{ groups[inventory_hostname+\"_interconnect\"] }}"
+    
+
+

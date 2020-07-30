@@ -1,0 +1,14 @@
+# each node will have a nodeportconfig part of this list
+# on both switches.
+nodeportconfig:
+- - nodename: SVC1_n1
+    ports: [p1, p2]
+    zone_suffix: p1_p2
+  - nodename: SVC1_n2
+    ports: [p3, p4]
+    zone_suffix: p3_p4
+
+brocadeindex: 1
+
+configname: ConfigA
+

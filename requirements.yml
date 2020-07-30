@@ -1,0 +1,9 @@
+---
+collections:
+- ibm.spectrum_virtualize
+- brocade.fos
+- cisco.nxos
+- hpe.oneview 
+roles:
+- lenovo.lxca-config
+

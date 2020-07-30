@@ -1,0 +1,27 @@
+---
+- name: Using the IBM Spectrum Virtualize collection
+  hosts: blade
+  connection: local
+  gather_facts: no
+  serial: 1
+  collections:
+    - ibm.spectrum_virtualize
+  vars:
+    - svcuser:       "{{ lookup('env','IBMSVC_USERNAME') }}" 
+    - svcpassword:   "{{ lookup('env','IBMSVC_PASSWORD') }}" 
+  tasks:
+    - name: ensure host exist
+      ignore_errors: false
+      delegate_to: localhost
+      ibm_svc_host:
+        clustername: '{{ svc_ip }}'
+        validate_certs: false # SAD!
+        username: "{{ svcuser }}"
+        password: "{{ svcpassword }}"
+        log_path: /tmp/playbook.debug
+        name: "{{ inventory_hostname }}{{ svc_hostname_suffix}}"
+        state: present
+        protocol: scsi
+        type: generic
+        fcwwpn: "{{wwpnb | replace(':','' )}}:{{ wwpna | replace(':','' )}}"
+

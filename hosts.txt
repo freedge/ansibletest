@@ -1,0 +1,25 @@
+[brocade]
+brocadea server_ip="localhost:8443" wwpn="wwpna"
+
+[blade]
+blade1 wwpna=abc wwpnb=def nodeportconfig=0
+blade2 wwpna=ghi wwpnb=jkl nodeportconfig=0
+
+[blade:vars]
+svc_hostname_suffix=
+svc_ip=localhost
+
+[switch]
+switch1 ansible_host="127.0.0.1"
+
+
+[switch1_interconnect]
+interco1
+
+[switch1_interconnect:vars]
+vlan="2,5,12"
+
+[brocadea_host]
+blade1
+blade2
+

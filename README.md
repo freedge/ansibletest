@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/freedge/freedge/_apis/build/status/freedge.ansibletest?branchName=master)](https://dev.azure.com/freedge/freedge/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/freedge/freedge/_apis/build/status/freedge.ansibletest?branchName=master)](https://dev.azure.com/freedge/freedge/_build/latest?definitionId=4&branchName=master)
 
 
 My ansible tester

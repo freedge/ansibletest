@@ -29,6 +29,12 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-  displayName: 'pytest'
+    fake-switches &
+    cd brosim ; python brosim.py & cd ..
+    ansible-playbook svc_host.yml
+    ansible-playbook network_leaf.yml
+    ansible-playbook brocade_zoning.yml
+    ansible-playbook svc_host.yml --check
+    ansible-playbook network_leaf.yml --check
+    ansible-playbook brocade_zoning.yml --check
+  displayName: 'test'

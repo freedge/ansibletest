@@ -27,14 +27,15 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    ( fake-switches > /tmp/cisco.log 2>&1 ) &
-    cd brosim ; ( python brosim.py > /tmp/storage.log 2>&1 ) & cd ..
+    nohup fake-switches > /tmp/cisco.log &
+    cd brosim ; nohup python brosim.py > /tmp/storage.log & cd ..
     sleep 1
     mkdir ~/.ssh ; touch ~/.ssh/known_hosts
     ssh-keyscan -T 2 -p 2222 -t rsa 127.0.0.1 >> ~/.ssh/known_hosts
     
     export ANSIBLE_LOG_PATH=/tmp/ansible.log
-    ansible-playbook svc_host.yml
+    export ANSIBLE_DEBUG=True
+    ansible-playbook svc_host.yml -vvvvvv
     ansible-playbook network_leaf.yml
     ansible-playbook brocade_zoning.yml
     ansible-playbook svc_host.yml --check

@@ -27,8 +27,8 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    nohup fake-switches > ~/cisco.log &
-    cd brosim ; nohup python brosim.py > ~/storage.log & cd ..
+    fake-switches &
+    cd brosim ; brosim.py & cd ..
     sleep 1
     mkdir ~/.ssh ; touch ~/.ssh/known_hosts
     ssh-keyscan -T 2 -p 2222 -t rsa 127.0.0.1 >> ~/.ssh/known_hosts
@@ -41,5 +41,5 @@ steps:
     timeout 60 ansible-playbook svc_host.yml --check
     timeout 60 ansible-playbook network_leaf.yml --check
     timeout 60 ansible-playbook brocade_zoning.yml --check
-    cat ~/ansible.log ~/cisco.log ~/storage.log /tmp/playbook.debug
+    cat ~/ansible.log /tmp/playbook.debug
   displayName: 'test'

@@ -35,11 +35,11 @@ steps:
     
     export ANSIBLE_LOG_PATH=~/ansible.log
     #export ANSIBLE_DEBUG=True
-    ansible-playbook svc_host.yml -v
-    ansible-playbook network_leaf.yml
-    ansible-playbook brocade_zoning.yml
-    ansible-playbook svc_host.yml --check
-    ansible-playbook network_leaf.yml --check
-    ansible-playbook brocade_zoning.yml --check
-    cat /tmp/playbook.debug ~/ansible.log ~/cisco.log ~/storage.log
+    timeout 60 ansible-playbook svc_host.yml -v
+    timeout 60 ansible-playbook network_leaf.yml
+    timeout 60 ansible-playbook brocade_zoning.yml
+    timeout 60 ansible-playbook svc_host.yml --check
+    timeout 60 ansible-playbook network_leaf.yml --check
+    timeout 60 ansible-playbook brocade_zoning.yml --check
+    cat ~/ansible.log ~/cisco.log ~/storage.log /tmp/playbook.debug
   displayName: 'test'

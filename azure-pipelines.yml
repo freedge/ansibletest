@@ -28,7 +28,7 @@ steps:
 
 - script: |
     fake-switches &
-    cd brosim ; brosim.py & cd ..
+    cd brosim ; python brosim.py & cd ..
     sleep 1
     mkdir ~/.ssh ; touch ~/.ssh/known_hosts
     ssh-keyscan -T 2 -p 2222 -t rsa 127.0.0.1 >> ~/.ssh/known_hosts

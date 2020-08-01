@@ -35,7 +35,7 @@ steps:
     
     export ANSIBLE_LOG_PATH=~/ansible.log
     #export ANSIBLE_DEBUG=True
-    timeout 120 ansible-playbook svc_host.yml -vvvvvv
+    timeout 300 ansible-playbook svc_host.yml
     timeout 60 ansible-playbook network_leaf.yml
     timeout 60 ansible-playbook brocade_zoning.yml
     timeout 60 ansible-playbook svc_host.yml --check

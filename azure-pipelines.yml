@@ -27,18 +27,16 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    sudo tcpdump -i any tcp port 7443 &
-
     fake-switches &
     cd brosim ; python brosim.py & cd ..
     sleep 1
     mkdir ~/.ssh ; touch ~/.ssh/known_hosts
     ssh-keyscan -T 2 -p 2222 -t rsa 127.0.0.1 >> ~/.ssh/known_hosts
-    top -b -d 5 &
     
     export ANSIBLE_LOG_PATH=~/ansible.log
     export ANSIBLE_DEBUG=False
-    timeout -s 6 20 ansible-playbook svc_host.yml -vvvvv
+    timeout -s 6 20 strace -f -o out.strace  -tt ansible-playbook svc_host.yml -v
+    cat out.strace
     timeout 60 ansible-playbook network_leaf.yml
     timeout 60 ansible-playbook brocade_zoning.yml
     timeout 60 ansible-playbook svc_host.yml --check

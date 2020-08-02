@@ -33,9 +33,11 @@ steps:
     sleep 1
     mkdir ~/.ssh ; touch ~/.ssh/known_hosts
     ssh-keyscan -T 2 -p 2222 -t rsa 127.0.0.1 >> ~/.ssh/known_hosts
+    df -h
+    mount
     
     export ANSIBLE_LOG_PATH=~/ansible.log
-    export ANSIBLE_DEBUG=true
+    export ANSIBLE_DEBUG=False
     timeout -s 6 60 ansible-playbook svc_host.yml -vvv
     
     timeout 60 ansible-playbook network_leaf.yml

@@ -23,3 +23,5 @@ vlan="2,5,12"
 blade1
 blade2
 
+[enclosure]
+enclosure1

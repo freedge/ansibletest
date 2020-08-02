@@ -4,12 +4,5 @@ interconnect:
   oltp1:
     port: X3
     rport: 0/1
-    description: TEST OLTP 19573854
+    description: TEST OLTP JIRA-42
     pc: 1062
-  oltp2:
-    port: X4
-    rport: 0/2
-  mgmt:
-    port: X6
-    rport: 0/3
-    description: TEST MGNT 19573854

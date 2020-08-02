@@ -1,0 +1,33 @@
+- hosts: enclosure
+  gather_facts: no
+  collections:
+    - hpe.oneview
+  environment:
+    ONEVIEWSDK_IP: localhost:9443
+    ONEVIEWSDK_USERNAME: toto@example.com
+    ONEVIEWSDK_PASSWORD: toto
+    ONEVIEWSDK_AUTH_LOGIN_DOMAIN: example.com
+    ONEVIEWSDK_SSL_CERTIFICATE: brosim/cert.pem
+
+  tasks:
+ 
+    # we need to get an URL for each network, so we start with that
+    - name: Gather facts about an Ethernet Network by name oltpa
+      oneview_ethernet_network_facts:
+        name: "OLTP-a"
+      delegate_to: localhost
+
+    - name: Get the network
+      set_fact: networkmgmta={{ ethernet_networks }}
+
+
+    - name: Gather facts about san-a
+      oneview_fc_network_facts:
+        name: "Fabric-A"
+      delegate_to: localhost
+
+    - name: Get the san
+      set_fact: fc_network_sana={{ fc_networks.0 }}
+
+# TODO: here comes the server profile template
+

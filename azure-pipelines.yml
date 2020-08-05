@@ -21,12 +21,15 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
+    python -m venv .
+    source bin/activate
     pip install -r requirements.txt
     ansible-galaxy collection install -r requirements.yml -p ./
     ansible-galaxy role install -r requirements.yml  -p ./
   displayName: 'Install dependencies'
 
 - script: |
+    source bin/activate
     fake-switches &
     cd brosim ; python brosim.py & cd ..
     sleep 1

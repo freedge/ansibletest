@@ -54,6 +54,7 @@
   delegate_to: localhost
   brocade_zoning_alias:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     aliases: "{{ aliases }}"
 
@@ -61,6 +62,7 @@
   delegate_to: localhost
   brocade_zoning_zone:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     zones: "{{zones}}"
 
@@ -69,6 +71,7 @@
   delegate_to: localhost
   brocade_zoning_cfg:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     members_add_only: True # very important - this means we don't remove the rest of the zones
     cfgs: "{{ cfgs }}"
@@ -85,6 +88,7 @@
   check_mode: false
   brocade_facts:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     gather_subset:
     - brocade_zoning
@@ -122,6 +126,7 @@
     - delete
   brocade_zoning_cfg:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     members_remove_only: True # very important - this means we don't remove the rest of the zones
     cfgs:
@@ -137,6 +142,7 @@
     - delete
   brocade_zoning_zone:
     credential: "{{credential}}"
+    timeout: 30
     vfid: -1
     zones_to_delete: "{{zones_to_remove}}"
   when: config_zones_to_remove | length > 0

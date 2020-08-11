@@ -23,6 +23,8 @@ vlan="2,5,12"
 blade1
 blade2
 
+[enclosure]
+enclosure1
 
 [pan]
 pan1 mgmt_ip=127.0.0.1 server_external_ip="100.1.1.1"

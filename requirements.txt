@@ -6,4 +6,8 @@ service_identity
 xmltodict # required by the brocade.fos collection
 paramiko  #
 
+hpICsp    # required by OneView
+hpOneView
+
 pandevice
+

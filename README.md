@@ -5,9 +5,10 @@ My ansible tester
 =================
 
 Test Ansible collections for
-- brocade fc switches
-- ibm svc
-- cisco switches
+- Brocade fc switches
+- IBM SVC
+- Cisco switches
+- HPE Oneview (what's available at the moment)
 
 (TODO: enclosures)
 

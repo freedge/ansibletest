@@ -151,6 +151,31 @@ class Svc(resource.Resource):
             logging.info("POST %s %r %s", request.getHeader('x-auth-token'), request.uri, content)
         return b"<html>Hello, world!</html>"
 
+class Oneview(resource.Resource):
+    isLeaf = True
+    def render_GET(self, request):
+        content = request.content.read().decode("utf-8")
+        logging.info("GET %s %r %s", request.getHeader('auth'), request.uri, content)
+        if request.uri.decode('utf-8').startswith('/rest/fc-networks'):
+            return json.dumps({"type":"IndexPaginatedCollectionV300","category":"resources","members":[
+                {"type":"IndexResourceV300","name":"Fabric-A","description":None,"multiAttributes":{},"ownerId":"cd","state":None,"status":"OK","created":"2015-01-14T10:32:21.821Z","modified":"2015-01-14T10:32:21.821Z","eTag":"2015-01-14T10:32:21.821Z","category":"fc-networks","uri":"/rest/fc-networks/41","applianceId":"42","scopeUris":None}
+                ],"created":None,"modified":None,"uri":"/rest/index/resources","prevPageUri":None,"nextPageUri":None,"start":0,"count":1,"total":1,"unFilteredTotal":7911,"eTag":None}).encode('utf-8')
+        else:
+            return json.dumps({}).encode('utf-8')
+
+    def render_POST(self, request):
+        global CONNECTION_ID
+        content = request.content.read().decode("utf-8")
+        if request.uri == b"/rest/login-sessions":
+            time.sleep(0.1) # this can take time
+            logging.info("POST %r %r %s", request.getHeader('auth'), request.uri, content)
+            CONNECTION_ID += 1
+            b = json.dumps({"sessionID": "CNX" + str(CONNECTION_ID)})
+            return b.encode('utf-8')
+        else:
+            logging.info("POST %s %r %s", request.getHeader('auth'), request.uri, content)
+        return b"<html>Hello, world!</html>"
+
 logging.basicConfig(level='DEBUG')
 logger = logging.getLogger()
 logger.setLevel('DEBUG')
@@ -164,6 +189,9 @@ site = server.Site(Svc())
 endpoint = endpoints.SSL4ServerEndpoint(reactor, 7443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
 endpoint.listen(site)
 
+site = server.Site(Oneview())
+endpoint = endpoints.SSL4ServerEndpoint(reactor, 9443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
+endpoint.listen(site)
 
 site = server.Site(Pan())
 endpoint = endpoints.SSL4ServerEndpoint(reactor, 6443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))

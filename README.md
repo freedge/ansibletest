@@ -26,7 +26,7 @@ Description
 
 Assumptions:
 
-- we have 2 blades, blade1 and blade1, part of the same enclosure
+- we have 2 blades, blade1 and blade2, part of the same enclosure
 - the enclosure have 1 interconnect, interco1
 - interco1 is linked to a cisco switch, switch1
 - interco1 is also linked to a brocade switch, brocadea, for storage

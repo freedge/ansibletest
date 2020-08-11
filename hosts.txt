@@ -2,8 +2,8 @@
 brocadea server_ip="localhost:8443" wwpn="wwpna"
 
 [blade]
-blade1 wwpna=abc wwpnb=def nodeportconfig=0
-blade2 wwpna=ghi wwpnb=jkl nodeportconfig=0
+blade1 wwpna=abc wwpnb=def nodeportconfig=0 ilo=1.1.1.1
+blade2 wwpna=ghi wwpnb=jkl nodeportconfig=0 ilo=1.1.1.2
 
 [blade:vars]
 svc_hostname_suffix=
@@ -25,3 +25,7 @@ blade2
 
 [enclosure]
 enclosure1
+
+[pan]
+pan1 mgmt_ip=127.0.0.1 server_external_ip="100.1.1.1"
+

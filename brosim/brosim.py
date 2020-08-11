@@ -6,9 +6,65 @@ from lxml import etree
 import time
 import json
 import logging
+from pprint import pprint
 
 CONNECTION_ID=0
  
+class Pan(resource.Resource):
+    isLeaf = True
+
+    def render_POST(self, request):
+        global CONNECTION_ID
+        content = request.content.read().decode("utf-8")
+        if request.uri == b"/api/" and not b"key" in request.args:
+            logging.info("POST login %r %s", request.uri, content)
+            CONNECTION_ID += 1
+            request.responseHeaders.addRawHeader("content-type", "application/xml; charset=utf-8" )
+            res=dict(response={ "__xml_attributes__": { "status":  "success" }, "result": 
+                 {"key" : "CNX" + str(CONNECTION_ID) }})
+            return etree.tostring(dict_2_etree(res), pretty_print=True)
+        elif request.uri == b"/api/" and request.args[b"type"][0] == b"config" and request.args[b"action"][0] == b"get" :
+            logging.info("POST get config %s %r %s", request.args[b"key"], request.uri, str(request.args))
+            request.responseHeaders.addRawHeader("content-type", "application/xml; charset=utf-8" )
+            res=dict(response={ "__xml_attributes__": { "status":  "success" }, "result": 
+                 {
+                   "rules": [ { "entry":  {  "__xml_attributes__": { "name": "SSH permit"} ,
+                        "from": { "member": "untrust" }, 
+                        "to": { "member": "trust" } , 
+                        "source": { "member" : "any" } , 
+                        "source-user": { "member": "any" }, 
+                        "hip-profiles": { "member": "any" }, 
+                        "destination" : {"member" : "1.1.1.1" },
+                        "application": { "member": "ssh" },
+                        "service": { "member": "application-default" },
+                        "category":  { "member": "any" },
+                        "action":  "allow",
+                        "log-start": "no",
+                        "log-end": "yes",
+                        "description": "SSH rule test",
+                        "rule-type": "universal",
+                        "negate-source": "no",
+                        "negate-destination": "no",
+                        "disabled": "no",
+                        "option": { "disable-server-response-inspection": "no" }
+
+                   } } ]
+                 }})
+            print(etree.tostring(dict_2_etree(res), pretty_print=True))
+            return etree.tostring(dict_2_etree(res), pretty_print=True)
+        elif request.uri == b"/api/":
+            logging.info("POST %s %r %s", request.args[b"key"], request.uri, str(request.args))
+            request.responseHeaders.addRawHeader("content-type", "application/xml; charset=utf-8" )
+            res=dict(response={ "__xml_attributes__": { "status":  "success" }, "result": 
+                 {
+                  "system" : { "sw-version" : "42.0.3.xfr", "model": "model", "serial": "X42" }
+                 }})
+            return etree.tostring(dict_2_etree(res), pretty_print=True)
+        else:
+            logging.info("POST %r %r %s", request.getHeader('authorization'), request.uri, content)
+        return b"<html>Hello, world!</html>"
+
+
 class Brocade(resource.Resource):
     isLeaf = True
     def render_PATCH(self, request):
@@ -63,7 +119,7 @@ class Brocade(resource.Resource):
         global CONNECTION_ID
         content = request.content.read().decode("utf-8")
         if request.uri == b"/rest/login":
-            time.sleep(0.1) # this can take time
+            time.sleep(11) # this can take time
             logging.info("POST login %r %s", request.uri, content)
             CONNECTION_ID += 1
             request.responseHeaders.addRawHeader("Authorization", "CNX" + str(CONNECTION_ID))
@@ -137,6 +193,9 @@ site = server.Site(Oneview())
 endpoint = endpoints.SSL4ServerEndpoint(reactor, 9443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
 endpoint.listen(site)
 
+site = server.Site(Pan())
+endpoint = endpoints.SSL4ServerEndpoint(reactor, 6443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
+endpoint.listen(site)
 reactor.run()
 
 

@@ -8,3 +8,6 @@ paramiko  #
 
 hpICsp    # required by OneView
 hpOneView
+
+pandevice
+

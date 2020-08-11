@@ -52,23 +52,33 @@
 
 - name: Define aliases, wwpn are updated if changed
   delegate_to: localhost
+  register: res
   brocade_zoning_alias:
     credential: "{{credential}}"
     vfid: -1
     aliases: "{{ aliases }}"
     timeout: 60
 
+- debug:
+    msg: changed {{ res.post_list | length }} aliases
+  when: res.post_list | length > 0
+
 - name: Define zones, zone are updated if changed
   delegate_to: localhost
+  register: res
   brocade_zoning_zone:
     credential: "{{credential}}"
     vfid: -1
     zones: "{{zones}}"
     timeout: 60
 
+- debug:
+    msg: changed {{ res.post_list | length }} zones - {{ res.post_list | map(attribute='name') | join(', ') }}
+  when: res.post_list | length > 0
 
 - name: Define config, ensure zone is part of the config
   delegate_to: localhost
+  register: res
   brocade_zoning_cfg:
     credential: "{{credential}}"
     vfid: -1
@@ -76,6 +86,9 @@
     cfgs: "{{ cfgs }}"
     timeout: 60
 
+- debug:
+    msg: changed config for {{ res.post_list.0.members | length }} zones
+  when: res.post_list | length > 0 and res.post_list.0.members | length > 0
 
 # Due to our naming convention for zone, if we change the zoning of a node, it will never actually change
 # an existing zone, but create a zone with a different name. Therefore we run the risk of having blades

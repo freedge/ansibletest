@@ -5,3 +5,5 @@ PyOpenSSL
 service_identity
 xmltodict # required by the brocade.fos collection
 paramiko  #
+
+pandevice

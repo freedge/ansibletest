@@ -38,6 +38,7 @@ steps:
     timeout 30 ansible-playbook svc_host.yml
     timeout 60 ansible-playbook network_leaf.yml
     timeout 60 ansible-playbook brocade_zoning.yml
+    timeout 60 ansible-playbook pan.yml
     timeout 60 ansible-playbook svc_host.yml --check
     timeout 60 ansible-playbook network_leaf.yml --check
     timeout 60 ansible-playbook brocade_zoning.yml --check

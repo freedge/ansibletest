@@ -29,7 +29,7 @@
         description: 'IPMI rule'
         source_zone: ['untrust']
         destination_zone: ['trust']
-        source_ip: "[ {{ server_external_ip }} ]"
+        source_ip: "{{ server_external_ip }}"
         source_user: ['any']
         destination_ip: "{{destination_ips}}"
         category: ['any']

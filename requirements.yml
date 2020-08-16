@@ -5,6 +5,8 @@ collections:
 - cisco.nxos
 - hpe.oneview 
 - paloaltonetworks.panos
+- https://github.com/freedge/acs/releases/download/v0.1.1/freedge-acs-0.1.1.tar.gz
+  
 roles:
 - lenovo.lxca-config
 

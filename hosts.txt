@@ -27,3 +27,5 @@ blade2
 [pan]
 pan1 mgmt_ip=127.0.0.1 server_external_ip="100.1.1.1"
 
+[acsall]
+acs ansible_connection=network_cli ansible_network_os=freedge.acs.classic ansible_user=root ansible_password=root ansible_port=2222 ansible_host="127.0.0.1"

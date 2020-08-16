@@ -42,5 +42,6 @@ steps:
     timeout 60 ansible-playbook svc_host.yml --check
     timeout 60 ansible-playbook network_leaf.yml --check
     timeout 60 ansible-playbook brocade_zoning.yml --check
+    timeout 60 ansible-playbook acs.yml --check
     cat ~/ansible.log /tmp/playbook.debug
   displayName: 'test'

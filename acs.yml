@@ -1,0 +1,82 @@
+- name: test my new module
+  hosts: acsall
+  gather_facts: no
+  collections:
+    - freedge.acs
+  vars:
+    ports:
+    - id: 1
+      name: toto1
+      telnetPort: 7001
+    - id: 17
+      name: toto17
+      status: disabled
+      authentication_type: local
+  tasks:
+
+    - name: configure port
+      configure_ports:
+        ports:
+        - port: "{{item.id}}"
+          list_configuration:
+          - echo off
+          - cd /ports/serial_ports
+          - set_cas {{item.id}}
+          - set status={{item.status | default("enabled") }}
+          - set rj45_pin-out=auto
+          - set speed=9600
+          - set parity=none
+          - set data_bits=8
+          - set stop_bits=1
+          - set flow_control=none
+          - cd cas
+          - set port_name={{item.name}}
+          - set enable_auto_discovery=no
+          - set enable_speed_auto_detection=no
+          - set protocol=ssh
+          - set authentication_type={{item.authentication_type | default("tacacs+|local") }}
+          - set text_session_hot_key=^Z
+          - set power_session_hot_key=^P
+          - #set restful_hot_key=
+          - set telnet_port_alias={{item.telnetPort | default(7000 + item.id)}}
+          - #set ssh_port_alias=
+          - #set raw_mode_port_alias=
+          - #set port_ipv4_alias=
+          - set port_ipv4_alias_interface=eth0
+          - #set port_ipv6_alias=
+          - set port_ipv6_alias_interface=eth0
+          - set dcd_sensitivity=no
+          - set enable_auto_answer=no
+          - set dtr_mode=normal
+          - set dtr_off_interval=100
+          - set line_feed_suppression=disabled
+          - set null_after_cr_suppression=disabled
+          - set transmission_interval=20
+          - set break_sequence=~break
+          - set break_interval=500
+          - set show_multi-session_menu=disabled
+          - set log_in|out_multi_session_notification=disabled
+          - set informational_message_notification=enabled
+          - cd data_buffering
+          - set status=disabled
+          - set type=local
+          - set local_type=mmcblk0
+          - set time_stamp=disabled
+          - set login|logout_message=disabled
+          - set serial_session_logging=enabled
+          - cd alerts
+          - delete -
+          - add
+          - #set alert_string=
+          - #set script=
+          - #set emergency=
+          - next
+          - disable_alerts
+          - cd power
+          - delete -
+          - save --cancelOnError
+          - echo on
+          - commit
+      loop: "{{ports}}"
+          
+  

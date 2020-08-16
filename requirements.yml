@@ -5,6 +5,8 @@ collections:
 - cisco.nxos
 - hpe.oneview 
 - paloaltonetworks.panos
+- freedge.acs
+  
 roles:
 - lenovo.lxca-config
 

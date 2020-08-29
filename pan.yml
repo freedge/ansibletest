@@ -1,0 +1,40 @@
+---
+- hosts: pan
+  connection: local
+  gather_facts: false
+
+  collections:
+    - paloaltonetworks.panos
+
+  vars:
+    - admin_password: "{{ lookup('env','PAN_PASSWORD') }}"
+
+  tasks: 
+
+    - set_fact:
+        destination_ips: []
+    - name: get list of destination IPs
+      set_fact:
+        destination_ips: "{{ destination_ips + [ hostvars[item].ilo ]   }}"
+      loop: "{{ groups[\"blade\"] }}"
+
+    - name: permit IPMI access
+      delegate_to: localhost
+      panos_security_rule:
+        provider:
+          ip_address: "{{ mgmt_ip }}"
+          port: 6443
+          password: "{{admin_password}}"
+        rule_name: 'IPMI permit'
+        description: 'IPMI rule'
+        source_zone: ['untrust']
+        destination_zone: ['trust']
+        source_ip: "{{ server_external_ip }}"
+        source_user: ['any']
+        destination_ip: "{{destination_ips}}"
+        category: ['any']
+        application: ['ipmi']
+        service: ['udp-623', 'tcp-623']
+        hip_profiles: ['any']
+        action: 'allow'
+        commit: true

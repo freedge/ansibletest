@@ -4,6 +4,7 @@ collections:
 - brocade.fos
 - cisco.nxos
 - hpe.oneview 
+- paloaltonetworks.panos
 roles:
 - lenovo.lxca-config
 

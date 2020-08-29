@@ -52,27 +52,43 @@
 
 - name: Define aliases, wwpn are updated if changed
   delegate_to: localhost
+  register: res
   brocade_zoning_alias:
     credential: "{{credential}}"
     vfid: -1
     aliases: "{{ aliases }}"
+    timeout: 60
+
+- debug:
+    msg: changed {{ res.post_list | length }} aliases
+  when: res.post_list | length > 0
 
 - name: Define zones, zone are updated if changed
   delegate_to: localhost
+  register: res
   brocade_zoning_zone:
     credential: "{{credential}}"
     vfid: -1
     zones: "{{zones}}"
+    timeout: 60
 
+- debug:
+    msg: changed {{ res.post_list | length }} zones - {{ res.post_list | map(attribute='name') | join(', ') }}
+  when: res.post_list | length > 0
 
 - name: Define config, ensure zone is part of the config
   delegate_to: localhost
+  register: res
   brocade_zoning_cfg:
     credential: "{{credential}}"
     vfid: -1
     members_add_only: True # very important - this means we don't remove the rest of the zones
     cfgs: "{{ cfgs }}"
+    timeout: 60
 
+- debug:
+    msg: changed config for {{ res.post_list.0.members | length }} zones
+  when: res.post_list | length > 0 and res.post_list.0.members | length > 0
 
 # Due to our naming convention for zone, if we change the zoning of a node, it will never actually change
 # an existing zone, but create a zone with a different name. Therefore we run the risk of having blades
@@ -86,6 +102,7 @@
   brocade_facts:
     credential: "{{credential}}"
     vfid: -1
+    timeout: 60
     gather_subset:
     - brocade_zoning
 
@@ -95,7 +112,7 @@
     existing_zones_for_blades: []
 - set_fact:
     existing_zones_for_blades: "{{existing_zones_for_blades + (existing_zones | select('match', \"z_h_\" + item + \".*\") | list)}} "
-  loop: "{{ansible_play_hosts}}"
+  loop: "{{hosts}}"
 - name: Compute list of extra zones to delete
   set_fact: 
     config_zones_to_remove: "{{existing_zones_for_blades | difference(zonelist) | list }}"
@@ -113,7 +130,7 @@
   changed_when: true  # we just say it changed here because the brocade tasks do not necessarily report the change in check mode
 
 - debug:
-    msg: "These are the zones that should be destroyed on {{brocade.server_ip}}: {{config_zones_to_remove }}"
+    msg: "These are the zones that should be destroyed on {{server_ip}}: {{config_zones_to_remove }}"
   when: config_zones_to_remove | length > 0
 
 - name: Remove extra zone from config
@@ -123,9 +140,10 @@
   brocade_zoning_cfg:
     credential: "{{credential}}"
     vfid: -1
+    timeout: 60
     members_remove_only: True # very important - this means we don't remove the rest of the zones
     cfgs:
-    - name: "{{brocade.configname }}"
+    - name: "{{configname }}"
       members: "{{config_zones_to_remove}}"
   when: config_zones_to_remove | length > 0
   changed_when: true
@@ -138,6 +156,7 @@
   brocade_zoning_zone:
     credential: "{{credential}}"
     vfid: -1
+    timeout: 60
     zones_to_delete: "{{zones_to_remove}}"
   when: config_zones_to_remove | length > 0
   changed_when: true

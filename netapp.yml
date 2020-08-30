@@ -35,9 +35,8 @@
       tiering_policy: auto
       policy: default
       percent_snapshot_space: 0
-      #qos_policy_group: max_performance_gold
       vserver: ansibleVServer
-      wait_for_completion: True
+      # wait_for_completion: True
       nvfail_enabled: False
       comment: ansible created volume
       junction_path: /toto

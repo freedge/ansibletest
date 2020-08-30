@@ -1,0 +1,52 @@
+---
+- hosts: netapp
+  connection: local
+  gather_facts: false
+  collections:
+    - netapp.ontap
+  vars:
+    - netapp_password: "{{ lookup('env','NETAPP_PASSWORD') }}"
+  tasks:
+  - name: get info
+    delegate_to: localhost
+    na_ontap_info:
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: True
+      http_port: "{{ netapp_port }}"
+      validate_certs: no # sad!
+      use_rest: Always
+      vserver: toto
+      gather_subset:
+        - volume_info
+        - lun_info
+
+  - name: Volume create
+    delegate_to: localhost
+    na_ontap_volume:
+      state: present
+      name: vol1
+      is_infinite: False
+      aggregate_name: ansible_aggr_data
+      size: 250
+      size_unit: gb
+      space_guarantee: none
+      tiering_policy: auto
+      policy: default
+      percent_snapshot_space: 0
+      vserver: ansibleVServer
+      # wait_for_completion: True
+      nvfail_enabled: False
+      comment: ansible created volume
+      junction_path: /toto
+      language: "C.UTF-8"
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: True
+      http_port: "{{ netapp_port }}"
+      validate_certs: no # sad!
+      use_rest: Always
+
+

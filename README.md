@@ -8,6 +8,8 @@ Test Ansible collections for
 - brocade fc switches
 - ibm svc
 - cisco switches
+- palo alto fw
+- netapp NFS storage
 
 (TODO: enclosures)
 

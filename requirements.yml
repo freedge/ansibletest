@@ -5,6 +5,7 @@ collections:
 - cisco.nxos
 - hpe.oneview 
 - paloaltonetworks.panos
+- netapp.ontap
 roles:
 - lenovo.lxca-config
 

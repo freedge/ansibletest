@@ -151,6 +151,23 @@ class Svc(resource.Resource):
             logging.info("POST %s %r %s", request.getHeader('x-auth-token'), request.uri, content)
         return b"<html>Hello, world!</html>"
 
+class NetApp(resource.Resource):
+    isLeaf = True
+
+    def render_POST(self, request):
+        global CONNECTION_ID
+        content = request.content.read().decode("utf-8")
+        if not request.getHeader('authorization'):
+            logging.info("POST %r %r %s", "authenticating", request.uri, content)
+            request.setResponseCode(401)
+            request.responseHeaders.addRawHeader("WWW-Authenticate", "Basic realm=\"Remote Administrative API Support\"")
+            return b"<html>whatever</html>"
+        else:
+            logging.info("POST %r %r %s", " ", request.uri, content)
+            logging.info(request.requestHeaders)
+            res=dict(netapp={"results": {"__xml_attributes__": { "status": "passed"},  "major-version": "1", "minor-version": "130" }})
+            return etree.tostring(dict_2_etree(res), pretty_print=True)
+
 logging.basicConfig(level='DEBUG')
 logger = logging.getLogger()
 logger.setLevel('DEBUG')
@@ -168,6 +185,11 @@ endpoint.listen(site)
 site = server.Site(Pan())
 endpoint = endpoints.SSL4ServerEndpoint(reactor, 6443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
 endpoint.listen(site)
+
+site = server.Site(NetApp())
+endpoint = endpoints.SSL4ServerEndpoint(reactor, 10443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
+endpoint.listen(site)
+
 reactor.run()
 
 

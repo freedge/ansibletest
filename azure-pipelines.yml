@@ -30,18 +30,18 @@ steps:
     fake-switches &
     cd brosim ; python brosim.py & cd ..
     sleep 1
-    ansible-playbook knownhosts.yml
+    ansible-playbook knownhosts.yml || exit -1
     
     export ANSIBLE_LOG_PATH=~/ansible.log
     #export ANSIBLE_DEBUG=True
-    timeout 30 ansible-playbook svc_host.yml
-    timeout 60 ansible-playbook network_leaf.yml
-    timeout 60 ansible-playbook brocade_zoning.yml
-    timeout 60 ansible-playbook pan.yml
-    timeout 60 ansible-playbook netapp.yml
-    timeout 60 ansible-playbook svc_host.yml --check
-    timeout 60 ansible-playbook network_leaf.yml --check
-    timeout 60 ansible-playbook brocade_zoning.yml --check
-    timeout 60 ansible-playbook netapp.yml --check
+    timeout 10 ansible-playbook svc_host.yml                   || exit -2
+    timeout 10 ansible-playbook network_leaf.yml               || exit -3
+    timeout 10 ansible-playbook brocade_zoning.yml             || exit -4
+    timeout 10 ansible-playbook pan.yml                        || exit -5
+    timeout 10 ansible-playbook netapp.yml                     || exit -6
+    timeout 10 ansible-playbook svc_host.yml --check           || exit -7
+    timeout 10 ansible-playbook network_leaf.yml --check       || exit -8
+    timeout 10 ansible-playbook brocade_zoning.yml --check     || exit -9
+    timeout 10 ansible-playbook netapp.yml --check             || exit -10
     cat ~/ansible.log /tmp/playbook.debug
   displayName: 'test'

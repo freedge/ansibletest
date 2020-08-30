@@ -119,7 +119,7 @@ class Brocade(resource.Resource):
         global CONNECTION_ID
         content = request.content.read().decode("utf-8")
         if request.uri == b"/rest/login":
-            time.sleep(11) # this can take time
+            time.sleep(0.1) # this can take time
             logging.info("POST login %r %s", request.uri, content)
             CONNECTION_ID += 1
             request.responseHeaders.addRawHeader("Authorization", "CNX" + str(CONNECTION_ID))

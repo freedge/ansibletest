@@ -37,7 +37,7 @@
       name: ansiblePolicyName
       vserver: ansibleVServer
 
-  - name: Create ExportPolicyRule. TODO: Should set all the rules of the policy
+  - name: Create ExportPolicyRule # TODO: Should set all the rules of the policy
     delegate_to: localhost
     na_ontap_export_policy_rule:
       state: present

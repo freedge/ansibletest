@@ -22,6 +22,40 @@
         - volume_info
         - lun_info
 
+
+  - name: Create Export Policy
+    delegate_to: localhost
+    na_ontap_export_policy:
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: True
+      http_port: "{{ netapp_port }}"
+      validate_certs: no # sad!
+      use_rest: Always
+      state: present
+      name: ansiblePolicyName
+      vserver: ansibleVServer
+
+  - name: Create ExportPolicyRule. TODO: Should set all the rules of the policy
+    delegate_to: localhost
+    na_ontap_export_policy_rule:
+      state: present
+      name: default123
+      vserver: ansibleVServer
+      client_match: 1.2.3.4
+      ro_rule: sys
+      rw_rule: sys
+      protocol: nfs
+      # super_user_security: any
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: True
+      http_port: "{{ netapp_port }}"
+      validate_certs: no # sad!
+      use_rest: Always
+
   - name: Volume create
     delegate_to: localhost
     na_ontap_volume:
@@ -48,5 +82,3 @@
       http_port: "{{ netapp_port }}"
       validate_certs: no # sad!
       use_rest: Always
-
-

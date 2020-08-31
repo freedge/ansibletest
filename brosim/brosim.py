@@ -168,6 +168,12 @@ class NetApp(resource.Resource):
             res=dict(netapp={"results": {"__xml_attributes__": { "status": "passed"},  "major-version": "1", "minor-version": "130" }})
             return etree.tostring(dict_2_etree(res), pretty_print=True)
 
+    def render_GET(self, request):
+        content = request.content.read().decode("utf-8")
+        logging.info("GET %s %r %s", request.getHeader('authorization'), request.uri, content)
+        res={"num_records": 1, "records":[ { "id": 41, "name" : "lename", "svm":  { "uuid": "42" } } ]}
+        return json.dumps(res).encode('utf-8')
+
 logging.basicConfig(level='DEBUG')
 logger = logging.getLogger()
 logger.setLevel('DEBUG')

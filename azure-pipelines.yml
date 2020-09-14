@@ -22,6 +22,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
+    pushd infoblox-ansible/ansible_collections/infoblox/nios_modules ; sed -i "s/^version.*/version: 1.0.0/" ; ansible-galaxy collection build --force ; popd
     ansible-galaxy collection install -r requirements.yml -p ./
     ansible-galaxy role install -r requirements.yml  -p ./
   displayName: 'Install dependencies'
@@ -39,6 +40,7 @@ steps:
     timeout 10 ansible-playbook brocade_zoning.yml
     timeout 10 ansible-playbook pan.yml
     timeout 10 ansible-playbook netapp.yml
+    timeout 10 ansible-playbook ilo_dns.yml
     timeout 10 ansible-playbook svc_host.yml --check
     timeout 10 ansible-playbook network_leaf.yml --check
     timeout 10 ansible-playbook brocade_zoning.yml --check

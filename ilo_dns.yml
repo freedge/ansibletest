@@ -1,0 +1,45 @@
+- hosts: blade
+  connection: local
+  check_mode: True
+  collections:
+    - infoblox.nios_modules
+  vars:
+    nios_provider:
+      username: user
+      password: password
+      host: 127.0.0.1:11443
+    nios_fields:
+    - binding_state
+    - hardware
+    - client_hostname
+    - address
+    - network
+    - network_view
+    nios_filter:
+      client_hostname: "{{ilo}}"
+  tasks:
+  - name: fetch lease for {{ inventory_hostname }}
+    delegate_to: localhost
+    set_fact:
+      lease: "{{ lookup('nios', 'lease', filter=nios_filter, provider=nios_provider, return_fields=nios_fields ) }}"
+
+  - delegate_to: localhost
+    debug:
+      var: lease
+
+  - name: configure ipv4 dhcp fixed address based on existing lease 
+    nios_fixed_address:
+      name: "{{ilo}}"
+      ipaddr: "{{ lease.address }}"
+      mac: "{{ lease.hardware }}"
+      network: "{{lease.network }}"
+      network_view: "{{lease.network_view}}"
+      comment: iLO for {{ inventory_hostname }}
+      state: present
+      provider: "{{ nios_provider }}"
+      extattrs:
+        Project: myproject
+        Editor: "{{nios_provider.username }}"
+    delegate_to: localhost
+
+  

@@ -168,6 +168,24 @@ class NetApp(resource.Resource):
             res=dict(netapp={"results": {"__xml_attributes__": { "status": "passed"},  "major-version": "1", "minor-version": "130" }})
             return etree.tostring(dict_2_etree(res), pretty_print=True)
 
+class Infoblox(resource.Resource):
+    isLeaf = True
+    def render_GET(self, request):
+        content = request.content.read().decode("utf-8")
+        logging.info("GET %s %r %s", request.getHeader('authorization'), request.uri, content)
+        res = [{"_ref": "lease/ZG5zLmxlYXNlJDAvMTAuMTAuMC4yMDAvMC8:10.10.10.200/test",
+                "address": "10.10.10.200",
+                "network_view": "test",
+                "hardware": "hw",
+                "binding_state": "ACTIVE",
+                "client_hostname": "ch",
+                "network": "default"
+
+        }]
+        return json.dumps(res).encode('utf-8')
+         
+
+
 logging.basicConfig(level='DEBUG')
 logger = logging.getLogger()
 logger.setLevel('DEBUG')
@@ -188,6 +206,10 @@ endpoint.listen(site)
 
 site = server.Site(NetApp())
 endpoint = endpoints.SSL4ServerEndpoint(reactor, 10443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
+endpoint.listen(site)
+
+site = server.Site(Infoblox())
+endpoint = endpoints.SSL4ServerEndpoint(reactor, 11443, ssl.DefaultOpenSSLContextFactory("pkey", "cert.pem"))
 endpoint.listen(site)
 
 reactor.run()

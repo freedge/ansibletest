@@ -1,0 +1,4 @@
+[submodule "infoblox-ansible"]
+	path = infoblox-ansible
+	url = https://github.com/infobloxopen/infoblox-ansible.git
+	branch = master

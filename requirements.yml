@@ -6,6 +6,7 @@ collections:
 - hpe.oneview 
 - paloaltonetworks.panos
 - netapp.ontap
+- infoblox-ansible/ansible_collections/infoblox/nios_modules/infoblox-nios_modules-1.0.0.tar.gz
 roles:
 - lenovo.lxca-config
 

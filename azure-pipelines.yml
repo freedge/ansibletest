@@ -22,6 +22,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
+    git submodule update --init ; pushd infoblox-ansible ; git pull origin master ; popd
     pushd infoblox-ansible/ansible_collections/infoblox/nios_modules ; sed -i "s/^version.*/version: 1.0.0/" ; ansible-galaxy collection build --force ; popd
     ansible-galaxy collection install -r requirements.yml -p ./
     ansible-galaxy role install -r requirements.yml  -p ./
